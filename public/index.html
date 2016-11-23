@@ -5,13 +5,82 @@
 </head>
 <body>
 
-<h1>This is a Heading</h1>
+<h1>Gauge</h1>
 <p title="I'm a tooltip">
 Mouse over this paragraph, to display the title attribute as a tooltip.
 </p>
- <a href="http://www.clonk.de">Example</a> 
+ <form>
+  Size:
+  <input type="text" name="Size" id="labelsize" value="300">
+  Value:
+  <input type="text" name="Size" id="labelvalue" value="50">
+  Label:
+  <input type="text" name="Size" id="labellabel" value="Name">
+  Background Color:
+  <input type="text" name="Size" id="labelbgcolor" value="">
+</form> 
+
  <br>
- <img src="http://192.169.7.1:8090/gauge?type=png" alt="Gauge" width="300" height="300"> 
+ <input type="button" onclick="showGraph()" value="Draw Gauge">
  <br>
+ <img src="http://192.169.7.1:8090/gauge?type=png" alt="Gauge" width="300" height="300" id="graph"> 
+ <br>
+
+<h1>Line Chart</h1>
+<p title="I'm a tooltip">
+Mouse over this paragraph, to display the title attribute as a tooltip.
+</p>
+<form>
+	<input type="text" name="id">
+</form>
+ <input type="button" onclick="showLineGraph()" value="Draw Line Graph">
+<br>
+ <img src="http://www.immovation-ag.de/salamander-areal/__neuer-blog/affe.jpg" alt="Gauge" width="300" height="300" id="linegraph"> 
+
+ <script>
+function showGraph() {
+	var size = document.getElementById("labelsize").value;
+	var value = document.getElementById("labelvalue").value;
+	var label = document.getElementById("labellabel").value;
+	var bgcolor = document.getElementById("labelbgcolor").value;
+	
+	var urlsize = "&size=";
+	var urlvalue = "&value=";
+	var urllabel = "&label=";
+	var urlbgcolor = "&bgcolor=";
+	
+	if (size != "") urlsize += size;
+	else urlsize += "300";
+	
+	if (value != "") urlvalue += value;
+	else urlvalue += "50";
+	
+	if (label != "") urllabel += label;
+	else urllabel += "Name";
+	
+	urlbgcolor += bgcolor;
+	
+	var url = "http://192.169.7.1:8090/gauge?type=png";
+	url += urlsize + urlvalue + urllabel + urlbgcolor;
+    
+	document.getElementById("graph").src = url;
+	document.getElementById("graph").style.width = size + "px";
+	document.getElementById("graph").style.height = size + "px";
+	
+}
+
+function showLineGraph() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("linegraph").src = this.responseText;
+			//src auf lokalen speicher beim fertig generierten bild verweisen
+		}
+	};
+	xhttp.open("POST", "/linechart", true);
+	xhttp.send();
+}
+</script>
+ 
 </body>
 </html> 

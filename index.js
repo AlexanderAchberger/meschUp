@@ -64,6 +64,12 @@ app.get('/gauge', function(req, res) {
     }
   });
   
+app.post('/linechart', function(req, res) { 
+	console.log("get a post");
+	//res.sendFile(html_dir + 'gauge.html');
+	//res.redirect("/gauge.html");
+	res.sendFile(html_dir + '/images/gauge.png');
+}); 
 
 //to get the parameter directly from the route
 // http://localhost:8080/api/1
