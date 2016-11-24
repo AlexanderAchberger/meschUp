@@ -15,7 +15,16 @@
 </style>
 <svg width="960" height="500"></svg>
 <script type="text/javascript" src="./js/d3.v2.js"></script>
+<script type='text/javascript' src="./js/jquery-3.1.1.min.js"></script>
 <script>
+$.post("/linechart",
+        {
+          name: "Donald Duck",
+          city: "Duckburg"
+        },
+        function(data,status){
+            //alert("Data: " + data + "\nStatus: " + status);
+        });
 
 var svg = d3.select("svg"),
     margin = {top: 20, right: 80, bottom: 30, left: 50},

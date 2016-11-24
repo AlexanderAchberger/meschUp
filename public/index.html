@@ -37,7 +37,11 @@ Mouse over this paragraph, to display the title attribute as a tooltip.
 <br>
  <img src="http://www.immovation-ag.de/salamander-areal/__neuer-blog/affe.jpg" alt="Gauge" width="300" height="300" id="linegraph"> 
 
+ 
+ <script type='text/javascript' src="./js/jquery-3.1.1.min.js"></script>
  <script>
+ 
+ 
 function showGraph() {
 	var size = document.getElementById("labelsize").value;
 	var value = document.getElementById("labelvalue").value;
@@ -70,7 +74,7 @@ function showGraph() {
 }
 
 function showLineGraph() {
-	var xhttp = new XMLHttpRequest();
+	/*var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			document.getElementById("linegraph").src = this.responseText;
@@ -78,7 +82,21 @@ function showLineGraph() {
 		}
 	};
 	xhttp.open("POST", "/linechart", true);
-	xhttp.send();
+	xhttp.send();*/
+	
+	$(document).ready(function(){
+    
+        $.post("/linechart",
+        {
+          name: "Donald Duck",
+          city: "Duckburg"
+        },
+        function(data,status){
+            //alert("Data: " + data + "\nStatus: " + status);
+        });
+    
+});
+	
 }
 </script>
  
