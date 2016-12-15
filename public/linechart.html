@@ -1,110 +1,207 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<html>
+	<meta charset="utf-8">
+	<style>
 
-.axis--x path {
-  display: none;
-}
+	.axis--x path {
+	  display: none;
+	}
 
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
+	.line {
+	  fill: none;
+	  stroke: steelblue;
+	  stroke-width: 1.5px;
+	}
+	
+	body
+	{
+		font: 10px arial;
+		margin:0;
+		padding:0;
+	}
+	svg
+	{
+		
+	}
+	
 
-</style>
-<svg width="600" height="300"></svg>
-<script src="./js/d3.min.js"></script>
-<script type='text/javascript' src="./js/jquery-3.1.1.min.js"></script>
-<script>
-/*
-$.get("/linechartdata", function(data){
-            alert("Data: " + data.name);
-        });
+	</style>
+	<div class="svg">
+		<svg id="svgobject"></svg>
 
-d3.json("/linechartdata", function(error, data) {
-	alert("Data: " + data.name);
-});
-*/		
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 80, bottom: 30, left: 50},
-    width = svg.attr("width") - margin.left - margin.right,
-    height = svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	</div>
+	
+	
+	
+	<script src="./js/d3.min.js"></script>
+	<script type='text/javascript' src="./js/jquery-3.1.1.min.js"></script>
+	<script>
+	function getParameterByName(name, url) {
+					if (!url) url = window.location.href;
+					name = name.replace(/[\[\]]/g, "\\$&");
+					var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+						results = regex.exec(url);
+					if (!results) return null;
+					if (!results[2]) return '';
+					return decodeURIComponent(results[2].replace(/\+/g, " "));
+				}			
+
+	var urlwidth = 600;
+	var urlheight = 300;
+	var bgcolor = "";
+	var yname = "Name";
+	var curvetype ="";
+	var dots = "true";
+	
+	if (getParameterByName('dots') != null && getParameterByName('dots') != '') dots = getParameterByName('dots');
+	if (getParameterByName('curvetype') != null && getParameterByName('curvetype') != '') curvetype = getParameterByName('curvetype');
+	if (getParameterByName('yname') != null && getParameterByName('yname') != '') yname = getParameterByName('yname');
+	if (getParameterByName('width') != null && getParameterByName('width') != '') urlwidth = getParameterByName('width');
+	if (getParameterByName('height') != null && getParameterByName('height') != '') urlheight = getParameterByName('height');
+	if (getParameterByName('bgcolor') != null && getParameterByName('bgcolor') != '')bgcolor = getParameterByName('bgcolor');
+	
+	var size = ((urlwidth-urlheight)/2);
+	document.getElementById("svgobject").style.width = urlwidth + "px";
+	document.getElementById("svgobject").style.height = urlheight + "px";
+	document.getElementById("svgobject").style.backgroundColor = bgcolor;
+	document.getElementById("svgobject").style.marginTop = size + "px";
+
+			
+	var svg = d3.select("svg"),
+		margin = {top: 20, right: 80, bottom: 30, left: 50},
+		width = urlwidth - margin.left - margin.right,
+		height = urlheight - margin.top - margin.bottom,
+		g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-var parseDate = d3.timeParse("%Y%m%d");
+	var parseDate = d3.timeParse("%Y%m%d");
 
-var x = d3.scaleTime().range([0, width]),
-    y = d3.scaleLinear().range([height, 0]),
-    color = d3.scaleOrdinal(d3.schemeCategory10);
+	var x = d3.scaleTime().range([0, width]),
+		y = d3.scaleLinear().range([height, 0]),
+		color = d3.scaleOrdinal(d3.schemeCategory10);
 
-
-var line = d3.line()
-    .curve(d3.curveBasis)
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.temperature); });
-
-var test = [{"date":"20111001","Happy":"63.4","Sad":"62.7","Angry":"72.2"},{"date":"20111002","Happy":"67.4","Sad":"61.7","Angry":"52.2"},{"date":"20111003","Happy":"60.4","Sad":"84.7","Angry":"44.2"}];
-
-d3.json("/linechartdata", function(error, datas) {
-	var data = datas.datas;
-  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+	var line = d3.line()
+		.curve(stringToCurveType(curvetype))
+		.x(function(d) { return x(d.date); })
+		.y(function(d) { return y(d.temperature); });
+		
+	
 
 
-  data.forEach(function(d) {
- d.date = parseDate(d.date);
-});
+	d3.json("/linechartdata", function(error, datas) {
+		var data = datas.datas;
+	  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
-  var cities = color.domain().map(function(name) {
-    return {
-      name: name,
-      values: data.map(function(d) {
-        return {date: d.date, temperature: +d[name]};
-      })
-    };
-  });
 
-  x.domain(d3.extent(data, function(d) { return d.date; }));
+	  data.forEach(function(d) {
+		d.date = parseDate(d.date);
+	});
+	
+	  var cities = color.domain().map(function(name) {
+		return {
+		  name: name,
+		  values: data.map(function(d) {
+			return {date: d.date, temperature: +d[name]};
+		  })
+		};
+	  });
+	  
+	//alert(cities);
+	
+	  x.domain(d3.extent(data, function(d) { return d.date; }));
 
-  y.domain([
-    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
-  ]);
+	  y.domain([
+		d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
+		d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+	  ]);
 
-  g.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+	  g.append("g")
+		  .attr("class", "axis axis--x")
+		  .attr("transform", "translate(0," + height + ")")
+		  .call(d3.axisBottom(x));
 
-  g.append("g")
-      .attr("class", "axis axis--y")
-      .call(d3.axisLeft(y))
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("fill", "#000")
-      .text("Temperature, ºF");
+	  g.append("g")
+		  .attr("class", "axis axis--y")
+		  .call(d3.axisLeft(y))
+		.append("text")
+		  .attr("transform", "rotate(-90)")
+		  .attr("y", 6)
+		  .attr("dy", "0.71em")
+		  .attr("fill", "#000")
+		  .text(yname);
 
-  var city = g.selectAll(".city")
-      .data(cities)
-    .enter().append("g")
-      .attr("class", "city");
+	  var city = g.selectAll(".city")
+		  .data(cities)
+		.enter().append("g")
+		  .attr("class", "city");
 
-  city.append("path")
-      .attr("class", "line")
-      .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { return color(d.name); });
+	  city.append("path")
+		  .attr("class", "line")
+		  .attr("d", function(d) {return line(d.values); })
+		  .style("stroke", function(d) { return color(d.name); });
+	//NEU
+	
+	var coords= [];
+	var i = 0;
+	cities.forEach(function(d) {
+		d.values.forEach(function(e) {
+			coords[i] = {x : e.date, y : e.temperature};
+			i++;
+		});
+	});
+	
+	if (dots == "true") {
+		g.selectAll(".dot")
+			.data(coords)
+		  .enter().append("circle")
+			.attr("class","dot")
+			.attr("r", 3.5)
+			.attr("cx", function(d) { return x(d.x); })
+			.attr("cy", function(d) { return y(d.y); });
+	}
+	  
+	  city.append("text")
+		  .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+		  .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
+		  .attr("x", 3)
+		  .attr("dy", ".35em")
+		  .style("font", "10px sans-serif")
+		  .text(function(d) { return d.name; });
+	});
+		
 
-  city.append("text")
-      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
-      .attr("x", 3)
-      .attr("dy", ".35em")
-	  .style("font", "10px sans-serif")
-      .text(function(d) { return d.name; });
-});
-                         
+	function stringToCurveType(curvetype) {
+		switch(curvetype) {
+		case "curveLinear":
+			return d3.curveLinear;
+			break;
+		case "curveStep":
+			return d3.curveStep;
+			break;
+		case "curveStepBefore":
+			return d3.curveStepBefore;
+			break;
+		case "curveStepAfter":
+			return d3.curveStepAfter;
+			break;
+		case "curveBasis":
+			return d3.curveBasis;
+			break;
+		case "curveCardinal":
+			return d3.curveCardinal;
+			break;
+		case "curveMonotoneX":
+			return d3.curveMonotoneX;
+			break;
+		case "curveCatmullRom":
+			return d3.curveCatmullRom;
+			break;
+		
+		default:
+			return d3.curveLinear;
+		}
+	
+	}
+	</script>
 
-</script>
+</html>

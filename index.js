@@ -1,4 +1,5 @@
 
+const spawn = require('child_process').spawn;
 const spawnSync = require('child_process').spawnSync;
 var express = require("express");
 var multer = require('multer'); // v1.0.5
@@ -37,7 +38,8 @@ app.get('/gauge', function(req, res) {
   var min = req.query.min;
   var max = req.query.max;
   var bgcolor = req.query.bgcolor;
-  console.log(type);
+  var imagename = req.query.imagename;
+  if (imagename == undefined) imagename = "gauge";
   var sizestring ="";
   var valuestring ="";
   var labelstring ="";
@@ -66,11 +68,11 @@ app.get('/gauge', function(req, res) {
 	console.log("Start phantom");
 	var url = html_dir + 'gauge.html' + paramstringpng;
 	//var url = 'http://192.169.7.1:8090/gauge' + paramstringpng;
-	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, 'gauge']);
+	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, size, imagename]);
 	console.log("end phantom");
 	
 		
-	res.sendFile(html_dir + '/images/gauge.png');
+	res.sendFile(html_dir + '/images/' + imagename + '.png');
     }
   });
 app.get('/linechartdata', function(req, res) {
@@ -84,6 +86,8 @@ app.get('/linechart', function(req, res) {
   var label = req.query.label;  
   var type = req.query.type;
   var bgcolor = req.query.bgcolor;
+  var imagename = req.query.imagename;
+  if (imagename == undefined) imagename = "linechart";
   var sizestring ="";
   var labelstring ="";
   var typestring ="";
@@ -95,8 +99,8 @@ app.get('/linechart', function(req, res) {
   if(bgcolor != undefined) {bgcolorsting = "&bgcolor=" + bgcolor; paramcouter = paramcouter + 1;}
   var paramstring = "";
   var parmstringpng ="";
-  if (paramcouter != 0) paramstring = "?" + sizestring + labelstring + typestring + bgcolorsting; 
-  if (paramcouter != 0) paramstringpng = "?" + sizestring + labelstring + bgcolorsting;
+  if (paramcouter != 0) paramstring = "?" + sizestring + labelstring + typestring + bgcolorsting + imagenamestring; 
+  if (paramcouter != 0) paramstringpng = "?" + sizestring + labelstring + bgcolorsting + imagenamestring;
   if (type != "png") {
 	res.sendFile(html_dir + 'linechart.html');
 	res.redirect("/linechart.html" + paramstring);
@@ -106,23 +110,60 @@ app.get('/linechart', function(req, res) {
 	console.log("Start phantom");
 	var url = html_dir + 'linechart.html' + paramstringpng;
 	//var url = 'http://192.169.7.1:8090/gauge' + paramstringpng;
-	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, 'linechart']);
+	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, size, imagename]);
 	console.log("end phantom");
 	
 		
-	res.sendFile(html_dir + '/images/linechart.png');
+	res.sendFile(html_dir + '/images/' + imagename + '.png');
     }
   });
-  
+
 app.post('/linechart', function(req, res) { 
+	console.log("get a post");
+	var width = req.query.width;
+	if(width == undefined) width = 600;
+	var height = req.query.height;
+	if(height == undefined) height = 300;
+	var bgcolor = req.query.bgcolor;
+	var curvetype = req.query.curvetype;
+	var dots = req.query.dots;
+	var size = 0;
+	var yname = req.query.yname;
+	if(yname == undefined) yname = "Name";
+	var imagename = req.query.imagename;
+	if (imagename == undefined) imagename = "linechart";
 	
-	console.log("get a post" + data);
+	var paramcouter = 0;
+	var dotssting ="";
+	if(dots != undefined) {dotssting = "&dots=" + dots; paramcouter = paramcouter + 1;}
+	var curvetypesting ="";
+	if(curvetype != undefined) {curvetypesting = "&curvetype=" + curvetype; paramcouter = paramcouter + 1;}
+	var ynamesting ="";
+	if(yname != undefined) {ynamesting = "&yname=" + yname; paramcouter = paramcouter + 1;}
+	var bgcolorsting ="";
+	if(bgcolor != undefined) {bgcolorsting = "&bgcolor=" + bgcolor; paramcouter = paramcouter + 1;}
+	var widthstring ="";	
+	if(width != undefined) {widthstring = "&width=" + width; paramcouter = paramcouter + 1;}
+	var heightstring ="";
+	if(height != undefined) {heightstring = "&height=" + height; paramcouter = paramcouter + 1;}
+	var paramstring = "";
+	if (paramcouter != 0) paramstring = "?" + widthstring + heightstring + bgcolorsting + ynamesting +dotssting + curvetypesting;
+	if (parseInt(height) > parseInt(width)) {size = height;}
+		else { size = width;}
 	data = req.body;
-	console.log(data);
+	console.log("Start render linechart");
+	var url = 'http://192.169.7.1:8090/linechart.html';
+	url = url + paramstring;
+	console.log(url);
+	var phantom = spawn('phantomjs', ['rasterize.js',url, size, size, imagename]);
 	//res.sendFile(html_dir + 'gauge.html');
 	//res.redirect("/gauge.html");
-	//res.sendFile(html_dir + 'linechart.html');
-	res.redirect("/linechart.html");
+	phantom.on('close', (code) => {
+		console.log("Finished render linechart");
+		res.send('http://192.169.7.1:8090/images/' + imagename + '.png');
+	});
+	
+	//res.sendFile(html_dir + '/images/linechart.png');
 }); 
 
 

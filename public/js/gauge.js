@@ -10,7 +10,7 @@ function Gauge(placeholderName, configuration)
 	{
 		this.config = configuration;
 		
-		this.config.size = this.config.size * 0.95;
+		this.config.size = this.config.size * 1;
 		
 		this.config.raduis = this.config.size * 1 / 2;
 		this.config.cx = this.config.size / 2;

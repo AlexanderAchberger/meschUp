@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+﻿ <!DOCTYPE html>
 <html>
 <head>
 <title>Documentation</title>
@@ -31,11 +31,33 @@ Mouse over this paragraph, to display the title attribute as a tooltip.
 Mouse over this paragraph, to display the title attribute as a tooltip.
 </p>
 <form>
-	<input type="text" name="id">
+	Width:
+  <input type="text" name="Size" id="labelWidth" value="600">
+	Height:
+  <input type="text" name="Size" id="labelHeight" value="300">
+	Background Color:
+  <input type="text" name="Size" id="linechartbgcolor" value="">
+	y-Name:
+  <input type="text" name="Size" id="labelyname" value="">
+	Curve Type:
+  <select name="curvetype" id="curvetype">
+    <option value="curveLinear">curveLinear</option>
+    <option value="curveStep">curveStep</option>
+    <option value="curveStepBefore">curveStepBefore</option>
+    <option value="curveStepAfter">curveStepAfter</option>
+	<option value="curveBasis">curveBasis</option>
+	<option value="curveCardinal">curveCardinal</option>
+	<option value="curveMonotoneX">curveMonotoneX</option>
+	<option value="curveCatmullRom">curveCatmullRom</option>
+  </select>
+	<br>
+	<input type="checkbox" id="Dots" name="Dots" value="Dots"> Dots
+  
 </form>
+<br>
  <input type="button" onclick="showLineGraph()" value="Draw Line Graph">
 <br>
- <img src="http://192.169.7.1:8090/linechart?type=png" alt="Gauge" width="300" height="300" id="linegraph"> 
+ <img src="" alt="Gauge" width="600" height="600" id="linegraph"> 
 
  
  <script type='text/javascript' src="./js/jquery-3.1.1.min.js"></script>
@@ -47,11 +69,13 @@ function showGraph() {
 	var value = document.getElementById("labelvalue").value;
 	var label = document.getElementById("labellabel").value;
 	var bgcolor = document.getElementById("labelbgcolor").value;
+
 	
 	var urlsize = "&size=";
 	var urlvalue = "&value=";
 	var urllabel = "&label=";
 	var urlbgcolor = "&bgcolor=";
+
 	
 	if (size != "") urlsize += size;
 	else urlsize += "300";
@@ -74,18 +98,41 @@ function showGraph() {
 }
 
 function showLineGraph() {
-	/*var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			document.getElementById("linegraph").src = this.responseText;
-			//src auf lokalen speicher beim fertig generierten bild verweisen
-		}
-	};
-	xhttp.open("POST", "/linechart", true);
-	xhttp.send();
-	*/
+	var width = document.getElementById("labelWidth").value;
+	var height = document.getElementById("labelHeight").value;
+	var bgcolor = document.getElementById("linechartbgcolor").value;
+	var yname = document.getElementById("labelyname").value;
+	var curvetype = document.getElementById("curvetype").value;
+	var dots = "false";
+	if (document.getElementById("Dots").checked == true) dots = "true";
+
+	var urldots = "&dots=";
+	var urlcurvetype = "&curvetype=";
+	var urlyname = "&yname=";
+	var urlwidth = "&width=";
+	var urlheight = "&height=";
+	var urlbgcolor = "&bgcolor=";
+	urlbgcolor += bgcolor;
+	urldots += dots;
+	urlcurvetype += curvetype;
+	
+	if (yname != "") urlyname += yname;
+	else urlyname += "Name";
+	
+	if (width != "") urlwidth += width;
+	else urlwidth += "600";
+	
+	if (height != "") urlheight += height;
+	else urlheight += "300";
+	
+	var size = 0;
+	if (height > width) size = height;
+		else size = width;
+	
+	var url = "/linechart?" + urlwidth + urlheight + urlbgcolor + urlyname + urlcurvetype + urldots;
+	
 	$(document).ready(function(){
-        $.post("/linechart",
+        $.post(url,
         {'datas' : [
 		  {"date": "20111001", "New York": "63.4", "San Francisco": "62.7", "Austin": "72.2"},
 		  {"date": "20120109", "New York": "34.7", "San Francisco": "52.3", "Austin": "54.0"},
@@ -94,39 +141,18 @@ function showLineGraph() {
 		  {"date": "20120930", "New York": "62.3", "San Francisco": "55.1", "Austin": "71.9"}
         ]},
         function(data,status){
-            //alert("Data: " + data + "\nStatus: " + status);
+			
+			document.getElementById("linegraph").src = data;
+			document.getElementById("linegraph").style.width = size + "px";
+			document.getElementById("linegraph").style.height = size + "px";
         });
-    /*
-	var size = document.getElementById("labelsize").value;
-	var value = document.getElementById("labelvalue").value;
-	var label = document.getElementById("labellabel").value;
-	var bgcolor = document.getElementById("labelbgcolor").value;
-	
-	var urlsize = "&size=";
-	var urlvalue = "&value=";
-	var urllabel = "&label=";
-	var urlbgcolor = "&bgcolor=";
-	
-	if (size != "") urlsize += size;
-	else urlsize += "300";
-	
-	if (value != "") urlvalue += value;
-	else urlvalue += "50";
-	
-	if (label != "") urllabel += label;
-	else urllabel += "Name";
-	
-	urlbgcolor += bgcolor;
-	*/
-	var url = "http://192.169.7.1:8090/linechart?type=png";
-	//url += urlsize + urlvalue + urllabel + urlbgcolor;
-    
-	document.getElementById("linegraph").src = url;
-	//document.getElementById("graph").style.width = size + "px";
-	//document.getElementById("graph").style.height = size + "px";
 });
-	
+
+
+
 }
+showLineGraph();
+
 </script>
  
 </body>
