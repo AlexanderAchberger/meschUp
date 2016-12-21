@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "^4.14.0",
     "multer": "^1.2.0",
+    "body-parser": "^1.15.2",
     "phantom": "^2.1.21"
   },
   "devDependencies": {},
@@ -18,5 +19,13 @@
     "graph"
   ],
   "author": "Alexander Achberger",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexanderAchberger/meschUp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexanderAchberger/meschUp/issues"
+  },
+  "homepage": "https://github.com/AlexanderAchberger/meschUp#readme"
 }
