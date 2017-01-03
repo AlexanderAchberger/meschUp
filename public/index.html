@@ -126,7 +126,7 @@ function showLineGraph() {
 	else urlheight += "300";
 	
 	var size = 0;
-	if (height > width) size = height;
+	if (parseInt(height) > parseInt(width)) size = height;
 		else size = width;
 	
 	var url = "/linechart?" + urlwidth + urlheight + urlbgcolor + urlyname + urlcurvetype + urldots;
@@ -141,8 +141,9 @@ function showLineGraph() {
 		  {"date": "20120930", "New York": "62.3", "San Francisco": "55.1", "Austin": "71.9"}
         ]},
         function(data,status){
-			
-			document.getElementById("linegraph").src = data;
+			var d = new Date();
+			var url = data + "?" + d;
+			document.getElementById("linegraph").src = url;
 			document.getElementById("linegraph").style.width = size + "px";
 			document.getElementById("linegraph").style.height = size + "px";
         });

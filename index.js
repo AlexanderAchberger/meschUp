@@ -67,14 +67,21 @@ app.get('/gauge', function(req, res) {
 	//start phantom as child_process
 	console.log("Start phantom");
 	var url = html_dir + 'gauge.html' + paramstringpng;
-	//var url = 'http://192.169.7.1:8090/gauge' + paramstringpng;
-	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, size, imagename]);
-	console.log("end phantom");
 	
-		
+	/*
+	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, size, imagename]);
+	console.log("end phantom");	
 	res.sendFile(html_dir + '/images/' + imagename + '.png');
+	*/
+	var phantom = spawn('phantomjs', ['rasterize.js',url, size, size, imagename]);
+	phantom.on('close', (code) => {
+		console.log("Finished render gauge");
+		res.sendFile(html_dir + '/images/' + imagename + '.png');
+	});
     }
   });
+
+  
 app.get('/linechartdata', function(req, res) {
 	console.log("Send data to html: " + data.name);
 	res.json(data);
@@ -110,13 +117,14 @@ app.get('/linechart', function(req, res) {
 	console.log("Start phantom");
 	var url = html_dir + 'linechart.html' + paramstringpng;
 	//var url = 'http://192.169.7.1:8090/gauge' + paramstringpng;
-	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, size, imagename]);
-	console.log("end phantom");
 	
-		
+	var phantom = spawnSync('phantomjs', ['rasterize.js',url, size, size, imagename]);
+	console.log("end phantom");		
 	res.sendFile(html_dir + '/images/' + imagename + '.png');
-    }
-  });
+	
+	
+  }
+});
 
 app.post('/linechart', function(req, res) { 
 	console.log("get a post");
@@ -154,16 +162,11 @@ app.post('/linechart', function(req, res) {
 	console.log("Start render linechart");
 	var url = 'http://192.169.7.1:8090/linechart.html';
 	url = url + paramstring;
-	console.log(url);
 	var phantom = spawn('phantomjs', ['rasterize.js',url, size, size, imagename]);
-	//res.sendFile(html_dir + 'gauge.html');
-	//res.redirect("/gauge.html");
 	phantom.on('close', (code) => {
 		console.log("Finished render linechart");
 		res.send('http://192.169.7.1:8090/images/' + imagename + '.png');
 	});
-	
-	//res.sendFile(html_dir + '/images/linechart.png');
 }); 
 
 
