@@ -76,8 +76,42 @@ If you want an image as output instead of an html page, you have to add '&type=p
 
 ###Linechart
 
+You can create your own Linechart with multiple lines. To achieve this you have to send a Post to the server with your data.
+The data must be built as follows:
+```
+var data = {'datas' : [
+          {"date": "x1", "Key1": "value", "Key2": "value", "Key3": "value" ...},
+          {"date": "x2", "Key1": "value", "Key2": "value", "Key3": "value" ...},
+          ...
+        ]};
+```
+It is important that the array with the data points is called 'datas' and each data point begins with "date" where you can define the x values of the data points.
+The more keys you have, the more lines you will get and every new "date" creates a new data point for each line.
+Here is an example of some data with three lines and 5 sample points:
+```
+var data = {'datas' : [
+          {"date": "20111001", "New York": "63.4", "San Francisco": Math.random()*100, "Austin": "72.2"},
+          {"date": "20120109", "New York": "34.7", "San Francisco": Math.random()*100, "Austin": "54.0"},
+          {"date": "20120418", "New York": "59.0", "San Francisco": Math.random()*100, "Austin": "65.1"},
+          {"date": "20120727", "New York": "79.4", "San Francisco": Math.random()*100, "Austin": "84.3"},
+          {"date": "20120930", "New York": "62.3", "San Francisco": Math.random()*100, "Austin": "71.9"}
+        ]};
+```
+This data has to be sent with a Post to the server. To post something to a server you also need the URL.
+The URL is built similar to the Gauge chart. The default URL is:  
+```
+192.169.7.1:8090/linechart
+```
+To create your own Linechart you can add parameters to the URL:
+* width: The width of the chart in pixels
+* height: The height of the chart in pixels
+* bgcolor: Sets the background color of the chart
+* yname: The label of the y-axis
+* curvetype: Here you can choose the type of interpolation
+* dots: If checked, dots will appear on each data point
+* imagename: the name of the image file
 
-
-
-
-
+Here is a sample URL with all possible parameters:
+```
+192.169.7.1:8090/linechart?&width=600&height=300&dots=true&curvetype=curveCardinal&imagename=image1&bgcolor=white&yname=temperatur
+```
